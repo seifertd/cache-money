@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
-  s.name     = "seifertd-cache-money"
-  s.version  = "0.2.5.1"
+  s.name     = "cache-money"
+  s.version  = "0.2.5.2"
   s.date     = "2008-11-24"
   s.summary  = "Write-through and Read-through Cacheing for ActiveRecord"
   s.email    = "nick@twitter.com"
