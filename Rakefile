@@ -31,3 +31,4 @@ namespace :britt do
     sh %{find . -name '*.rb' -exec sed -i '' 's/ *$//g' {} \\;}
   end
 end
+

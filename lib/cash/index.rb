@@ -64,7 +64,7 @@ module Cash
       end
 
       def window
-        limit && limit + buffer
+        limit && limit + (buffer || 1)
       end
     end
     include Attributes

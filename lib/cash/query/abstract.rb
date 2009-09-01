@@ -12,10 +12,12 @@ module Cash
       end
 
       def perform(find_options = {}, get_options = {})
+        #puts "CALLING PEFORM: options1: #{@options1.inspect}, options2: #{@options2.inspect}, find_options: #{find_options.inspect}, get_options: #{get_options.inspect}"
         if cache_config = cacheable?(@options1, @options2, find_options)
           cache_keys, index = cache_keys(cache_config[0]), cache_config[1]
-
+          #puts "CACHE KEYS: #{cache_keys.inspect}"
           misses, missed_keys, objects = hit_or_miss(cache_keys, index, get_options)
+          #puts "MISSES: #{misses.inspect}, MISSED_KEYS: #{missed_keys.inspect}"
           format_results(cache_keys, choose_deserialized_objects_if_possible(missed_keys, cache_keys, misses, objects))
         else
           uncacheable
@@ -49,12 +51,21 @@ module Cash
 
       private
       def cacheable?(*optionss)
+        #puts "CALLING CACHEABLE?: optionss: #{optionss.inspect}"
         optionss.each { |options| return unless safe_options_for_cache?(options) }
+        #puts "ALL OPTIONS ARE SAFE FOR CACHE"
         partial_indices = optionss.collect { |options| attribute_value_pairs_for_conditions(options[:conditions]) }
+        #puts "PARTIAL INDICES: #{partial_indices.inspect}"
         return if partial_indices.include?(nil)
+        #puts "NONE OF THE PARTIAL INDICES INCLUDED NIL"
+        #puts "SUM??? #{partial_indices.sum.inspect}"
         attribute_value_pairs = partial_indices.sum.sort { |x, y| x[0] <=> y[0] }
+        #puts "ATTRIBUTE_VALUE_PAIRS: #{attribute_value_pairs.inspect}"
         if index = indexed_on?(attribute_value_pairs.collect { |pair| pair[0] })
+          #puts "GOT A MATCHING INDEX: #{index.attributes.inspect}, CHECKING IF QUERY MATCHES"
+          #puts "QUERY ORDER: #{order.inspect}, INDEX ORDER: #{index.order.inspect}"
           if index.matches?(self)
+            #puts "QUERY MATCHES INDEX! YES!"
             [attribute_value_pairs, index]
           end
         end
@@ -111,11 +122,16 @@ module Cash
       end
 
       def indexed_on?(attributes)
-        indices.detect { |index| index == attributes }
+        #puts "CHECKING IF AN INDEX MATCHES: #{attributes.inspect}"
+        indices.detect do |index|
+          #puts "   -> INDEX ATTRIBUTES: #{index.attributes.inspect}"
+          index == attributes
+        end
       end
       alias_method :index_for, :indexed_on?
 
       def format_results(cache_keys, objects)
+        #puts "IN FORMAT RESULTS"
         return objects if objects.blank?
 
         objects = convert_to_array(cache_keys, objects)
