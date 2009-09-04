@@ -9,21 +9,15 @@ module Cash
 
     module ClassMethods
       def fetch(keys, options = {}, &block)
-        #puts "IN FETCH, KEYS: #{keys.inspect}, OPTIONS: #{options.inspect}, BLOCK: #{block.inspect}"
         case keys
         when Array
           keys = keys.collect { |key| cache_key(key) }
-          #puts "KEYS ARE ARRAY #{keys.inspect}"
           hits = repository.get_multi(keys)
-          #puts "HITS: #{hits.keys.inspect}"
           if (missed_keys = keys - hits.keys).any?
-            #puts "MISSED KEYS: #{missed_keys.inspect}"
             missed_values = block.call(missed_keys)
-            #puts "MISSED VALUES: #{missed_values.inspect}"
             # Stuff the newly hit stuff into the cache? Dubious?
             key_to_value = missed_keys.zip(Array(missed_values)).to_hash
             key_to_value.each do |new_key, new_val|
-              #puts "CALLING SET #{new_key.inspect} => #{new_val.inspect}"
               repository.set(new_key, new_val, options[:ttl] || 0, options[:raw])
             end
             hits.merge!(key_to_value)
@@ -35,7 +29,6 @@ module Cash
       end
 
       def get(keys, options = {}, &block)
-        #puts "IN GET, KEYS: #{keys.inspect}, OPTIONS: #{options.inspect}"
         case keys
         when Array
           fetch(keys, options, &block)
