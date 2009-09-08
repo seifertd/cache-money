@@ -338,7 +338,7 @@ module Cash
         describe '#find(1)' do
           it 'populates the cache' do
             Story.find(@story.id)
-            Story.fetch("id/#{@story.id}").should == [@story]
+            Story.fetch("id/#{@story.id}").should == @story
           end
         end
 

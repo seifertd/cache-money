@@ -156,9 +156,13 @@ module Cash
 
       def find_from_keys(*missing_keys)
         missing_ids = Array(missing_keys).flatten.collect { |key| key.split('/')[2].to_i }
-        vals = find_from_ids_without_cache(missing_ids, {}).inject({}) {|h,obj| h[obj.id] = obj; h}
-        # Reorder according to input ids
-        return missing_ids.map{|id| vals[id]}
+        vals = find_from_ids_without_cache(missing_ids, {})
+        if Array === vals
+          vals = vals.inject({}) {|h,obj| h[obj.id] = obj; h}
+          # Reorder according to input ids
+          return missing_ids.map{|id| vals[id]}
+        end
+        vals
       end
     end
   end
