@@ -129,7 +129,12 @@ module Cash
       end
 
       def serialize_objects(index, objects)
-        Array(objects).collect { |missed| index.serialize_object(missed) }
+        Array(objects).collect do |missed|
+          # Allow object to add stuff before caching.  This is
+          # a good way to precache child objects
+          missed.resolve_miss if missed.respond_to?(:resolve_miss)
+          index.serialize_object(missed)
+        end
       end
 
       def convert_to_array(cache_keys, object)
@@ -164,6 +169,7 @@ module Cash
         end
         vals
       end
+
     end
   end
 end
