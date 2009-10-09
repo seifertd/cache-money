@@ -1,5 +1,15 @@
 module Cash
   module Config
+    # Allow a default configuration
+    class << self
+      def defaults=(options)
+        @defaults = {:ttl => options[:ttl], :order => options[:order], :limit => options[:limit], :buffer => options[:buffer]}.reject{|k,v| v.nil?}
+      end
+      def defaults
+        @defaults || { :ttl => 1.day }
+      end
+    end
+
     def self.included(a_module)
       a_module.module_eval do
         extend ClassMethods
